@@ -11,10 +11,6 @@ credentials = st.secrets["GOOGLE_CLOUD_CREDENTIALS"]
 creds = Credentials.from_service_account_info(dict(credentials))
 
 def get_budget_data():
-    scope = [
-        "https://www.googleapis.com/auth/spreadsheets",
-        "https://www.googleapis.com/auth/drive"
-    ]
     client = gspread.authorize(creds)
     spreadsheet = client.open("Joint Budget")
     sheet = spreadsheet.worksheet("New Budget Format")
@@ -132,4 +128,3 @@ with col2:
     
     st.metric("Total Expenses (Monthly)", f"${total_expenses:.2f}")
     st.metric("Total Expenses (Annualized)", f"${annualized_total_expenses:.2f}")
-
