@@ -5,7 +5,6 @@ from google.oauth2.service_account import Credentials
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from google.oauth2.service_account import Credentials
 
 credentials = st.secrets["GOOGLE_CLOUD_CREDENTIALS"]  # No need for json.loads()
 creds = Credentials.from_service_account_info(dict(credentials))
