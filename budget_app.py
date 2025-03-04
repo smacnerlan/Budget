@@ -6,16 +6,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-credentials = st.secrets["GOOGLE_CLOUD_CREDENTIALS"]  # No need for json.loads()
+# Load credentials from Streamlit secrets
+credentials = st.secrets["GOOGLE_CLOUD_CREDENTIALS"]
 creds = Credentials.from_service_account_info(dict(credentials))
-
 
 def get_budget_data():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
         "https://www.googleapis.com/auth/drive"
     ]
-    creds = Credentials.from_service_account_file("iconic-rampart-452617-c4-0b640a4a2cd9.json", scopes=scope)
     client = gspread.authorize(creds)
     spreadsheet = client.open("Joint Budget")
     sheet = spreadsheet.worksheet("New Budget Format")
@@ -122,15 +121,8 @@ with col1:
         add_new_entry(sheet, new_item, new_income_expense, new_amount, new_category, new_expense_type)
 
 with col2:
-    st.subheader("Delete Budget Item")
-    delete_item = st.selectbox("Select Item to Delete", df['Item'].unique())
-    if st.button("Delete Selected Item"):
-        row_index = df[df['Item'] == delete_item].index[0]
-        delete_entry(sheet, row_index)
-        delete_entry(sheet, delete_index)
     st.subheader("Income")
     df_income = st.data_editor(df_income, column_config={"Amount": st.column_config.NumberColumn("Amount", format="$%.2f", step=0.01)}, num_rows="dynamic", key='income_amount_editor')
-    
     
     st.metric("Total Income (Monthly)", f"${total_income:.2f}")
     st.metric("Total Income (Annualized)", f"${annualized_total_income:.2f}")
@@ -138,37 +130,6 @@ with col2:
     st.subheader("Expenses")
     df_expense = st.data_editor(df_expense, column_config={"Amount": st.column_config.NumberColumn("Amount", format="$%.2f", step=0.01)}, num_rows="dynamic", key='expense_amount_editor')
     
-    
     st.metric("Total Expenses (Monthly)", f"${total_expenses:.2f}")
     st.metric("Total Expenses (Annualized)", f"${annualized_total_expenses:.2f}")
-    
-    st.subheader("Distributed Income vs. Actual Expenses by Expense Type")
-    expense_comparison = pd.DataFrame({
-        "Distributed Income (Monthly)": distributed_income,
-        "Actual Expenses (Monthly)": expense_by_type
-    }).fillna(0)
-    st.dataframe(expense_comparison)
-    
-    st.subheader("Comparison Chart")
-    labels = list(distributed_income.keys())
-    x = np.arange(len(labels))
-    width = 0.4
-    
-    fig, ax = plt.subplots()
-    ax.bar(x - width/2, [distributed_income[label] for label in labels], width, label="Distributed Income")
-    ax.bar(x + width/2, [expense_by_type.get(label, 0) for label in labels], width, label="Actual Expenses")
-    
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels)
-    ax.legend()
-    
-    st.pyplot(fig)
-    
-    st.subheader("Expense Breakdown by Category")
-    if "Category" in df_expense.columns:
-        category_expense = df_expense.groupby("Category")["Amount"].sum()
-        if not category_expense.empty:
-            fig, ax = plt.subplots()
-            ax.pie(category_expense, labels=category_expense.index, autopct='%1.1f%%')
-            ax.axis('equal')
-            st.pyplot(fig)
+
