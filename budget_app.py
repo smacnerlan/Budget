@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from google.oauth2.service_account import Credentials
 
-credentials = json.loads(st.secrets["GOOGLE_CLOUD_CREDENTIALS"])
-creds = Credentials.from_service_account_info(credentials)
+credentials = st.secrets["GOOGLE_CLOUD_CREDENTIALS"]  # No need for json.loads()
+creds = Credentials.from_service_account_info(dict(credentials))  # Convert to dict
+
 
 def get_budget_data():
     scope = [
