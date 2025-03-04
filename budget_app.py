@@ -5,6 +5,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
+credentials = json.loads(st.secrets["GOOGLE_CLOUD_CREDENTIALS"])
+creds = Credentials.from_service_account_info(credentials)
+
 def get_budget_data():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
